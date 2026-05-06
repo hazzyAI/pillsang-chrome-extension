@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>필상 AI 유해 사이트 탐지</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <div class="logo" role="img" aria-label="로고"></div>
+      <div class="header-text">
+        <h1>필상 AI 유해 사이트 탐지</h1>
+        <p>PillsAI Web Protection</p>
+      </div>
+    </div>
+    <label class="toggle-wrap" title="AI 탐지 켜기/끄기">
+      <input type="checkbox" id="toggle-detect">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+  <!-- 탭 네비게이션 -->
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="security">보안</button>
+    <button class="tab-btn" data-tab="history">히스토리</button>
+    <button class="tab-btn" data-tab="settings">설정</button>
+  </div>
+
+  <!-- 보안 탭 -->
+  <div id="tab-security" class="tab-content">
+    <div class="main">
+      <div id="state-loading" class="state hidden">
+        <img src="icons/character_loading.webp" class="char-img" alt="분석중">
+        <p>필상 AI가 분석중입니다.</p>
+      </div>
+
+      <div id="state-result" class="state hidden">
+        <div id="verdict-card" class="verdict-card">
+          <div id="verdict-icon" class="verdict-icon"></div>
+          <div id="verdict-label" class="verdict-label"></div>
+          <div class="prob-bar-wrap">
+            <div id="prob-bar" class="prob-bar"></div>
+          </div>
+          <div id="prob-text" class="prob-text"></div>
+        </div>
+        <div class="url-box">
+          <span class="url-label">분석 URL</span>
+          <div class="url-row">
+            <span id="url-text" class="url-text"></span>
+            <a id="btn-report" class="report-btn" href="https://www.pillsang.kr/phishingwarning" target="_blank">오탐 신고</a>
+          </div>
+        </div>
+        <div class="meta-row">
+          <span id="time-text" class="meta-item"></span>
+        </div>
+      </div>
+
+      <div id="state-error" class="state hidden">
+        <p id="error-text" class="error-text">오류가 발생했습니다</p>
+        <p class="error-hint">모델 파일이 없거나 설치가 필요합니다.</p>
+      </div>
+
+      <div id="state-waiting" class="state hidden">
+        <img src="icons/character_waiting.webp" class="char-img" alt="대기중">
+        <p>HTTP/HTTPS 페이지에서 자동으로 분석됩니다.</p>
+      </div>
+
+      <div id="state-off" class="state hidden">
+        <img src="icons/character_off.webp" class="char-img" alt="OFF">
+        <p class="off-text">현재 필상 AI 유해 사이트 탐지 기능이<br>OFF인 상태 입니다.</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <button id="btn-reanalyze" class="btn-reanalyze">현재 페이지 재분석</button>
+    </div>
+  </div>
+
+  <!-- 히스토리 탭 -->
+  <div id="tab-history" class="tab-content hidden">
+    <!-- 하위 탭 -->
+    <div class="sub-tab-nav">
+      <div class="segment-control">
+        <button class="sub-tab-btn active" data-period="daily">일간</button>
+        <button class="sub-tab-btn" data-period="weekly">주간</button>
+      </div>
+    </div>
+    <!-- 도넛 차트 -->
+    <div class="chart-section">
+      <div class="donut-container">
+        <svg id="donut-svg" width="120" height="120" viewBox="0 0 120 120"></svg>
+        <div class="donut-center-text">
+          <span class="donut-num" id="donut-num">0</span>
+          <span class="donut-sub"><span style="color:#e53935">유해</span><span style="color:#bdbdbd">/</span><span style="color:#ff9800">의심</span></span>
+        </div>
+      </div>
+      <ul class="donut-legend" id="donut-legend"></ul>
+    </div>
+    <!-- 히스토리 목록 -->
+    <div class="history-divider"><span>최근 탐지 기록</span></div>
+    <div id="history-list" class="history-list"></div>
+  </div>
+
+  <!-- 설정 탭 -->
+  <div id="tab-settings" class="tab-content hidden">
+    <div class="settings-list">
+      <div class="setting-item setting-item--col">
+        <div class="setting-row">
+          <div class="setting-info">
+            <span class="setting-title">유해 사이트 알림</span>
+            <span class="setting-desc">임계값 이상 시 알림 표시</span>
+          </div>
+          <label class="toggle-wrap">
+            <input type="checkbox" id="toggle-notify">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="threshold-row">
+          <span class="threshold-label">알림 임계값</span>
+          <input type="range" id="notify-threshold" min="50" max="90" step="5" value="70">
+          <span class="slider-val" id="notify-threshold-val">70%</span>
+        </div>
+      </div>
+      <div class="setting-item setting-item--col">
+        <div class="setting-row">
+          <div class="setting-info">
+            <span class="setting-title">위험 사이트 차단</span>
+            <span class="setting-desc">임계값 이상 시 경고 페이지 표시</span>
+          </div>
+          <label class="toggle-wrap">
+            <input type="checkbox" id="toggle-warn">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="threshold-row">
+          <span class="threshold-label">차단 임계값</span>
+          <input type="range" id="warn-threshold" min="55" max="95" step="5" value="80">
+          <span class="slider-val" id="warn-threshold-val">80%</span>
+        </div>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-title">다크 모드</span>
+          <span class="setting-desc">어두운 테마로 화면을 표시합니다</span>
+        </div>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="toggle-dark">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-title">히스토리 초기화</span>
+          <span class="setting-desc">저장된 모든 탐지 기록을 삭제합니다</span>
+        </div>
+        <button id="btn-clear-history" class="btn-clear-inline">삭제</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
