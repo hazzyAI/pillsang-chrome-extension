@@ -8,9 +8,39 @@
 ## 개요
 
 방문하는 모든 URL을 실시간으로 분석하여 피싱·유해 사이트 여부를 탐지합니다.  
-서버 DB 조회(화이트/블랙리스트) → 미등록 URL은 **온디바이스 ONNX 모델 추론**으로 2단계 탐지를 수행합니다.
+**서버 DB 조회(화이트/블랙리스트) → 미등록 URL은 온디바이스 ONNX 모델 추론**으로 2단계 탐지를 수행합니다.
 
-누적 다운로드 50만+ Android 앱 **싹다잡아**와 동일한 ML 모델을 Web 환경에 이식한 프로젝트입니다.
+누적 다운로드 50만+ Android 앱 **싹다잡아**와 동일한 CatBoost ML 모델을 Web 환경에 이식한 프로젝트입니다.
+
+---
+
+## 주요 화면
+
+### 탐지 결과 (보안 탭)
+
+| 안전 (0~20%) | 비교적 안전 (21~50%) |
+|:---:|:---:|
+| ![safe](assets/screenshots/01_popup_safe.png) | ![safe_26](assets/screenshots/03_popup_safe_26.png) |
+
+| 유해 의심 (51~70%) | 유해 사이트 (71%+) |
+|:---:|:---:|
+| ![suspect](assets/screenshots/04_popup_suspect.png) | ![danger](assets/screenshots/05_popup_danger.png) |
+
+---
+
+### 알림 및 차단
+
+| Chrome 알림 (기본 임계값 70%+) | 경고 페이지 (기본 임계값 80%+) |
+|:---:|:---:|
+| ![notification](assets/screenshots/06_notification.png) | ![warning](assets/screenshots/07_warning_page.png) |
+
+---
+
+### 히스토리 & 설정
+
+| 탐지 이력 (일간/주간 통계) | 설정 탭 |
+|:---:|:---:|
+| ![history](assets/screenshots/08_history_daily.png) | ![settings](assets/screenshots/11_settings.png) |
 
 ---
 
@@ -26,20 +56,25 @@
 [background.js] Service Worker
        │
        ├─ 1단계: 서버 DB 조회 (화이트/블랙리스트)
-       │         ├─ 화이트리스트 → 안전 (prob = 0)
-       │         └─ 블랙리스트  → 위험 (prob = 1)
+       │         ├─ 화이트리스트 → 안전 표시 (prob = 0%)
+       │         └─ 블랙리스트  → 위험 표시 (prob = 100%)
        │
        └─ 2단계: DB 미등록 → 로컬 ONNX 추론
-                 └─ [offscreen.js] CatBoost ONNX (WASM) 실행
+                 └─ [offscreen.js] CatBoost ONNX (WASM)
                            │
                            ▼
                     악성 확률 0.0 ~ 1.0 반환
 
-결과 처리
-  prob < 0.2  → 🟢 안전  (초록 아이콘)
-  prob < 0.5  → 🔵 주의  (파랑 아이콘)
-  prob < 0.8  → 🟠 경고  (주황 알림)
-  prob ≥ 0.8  → 🔴 위험  (경고 페이지 리디렉션)
+────────────────────────────────────────
+팝업 표시 상태
+  0  ~ 20% → 🟢 안전
+  21 ~ 50% → 🔵 비교적 안전
+  51 ~ 70% → 🟠 유해 의심
+  71%+     → 🔴 유해 사이트
+
+액션 (사용자 설정 가능)
+  ≥ 70% (기본) → Chrome 알림 표시
+  ≥ 80% (기본) → 경고 페이지 리디렉션
 ```
 
 ---
@@ -51,11 +86,11 @@
 | **실시간 URL 탐지** | 모든 탭 이동 시 자동 분석 |
 | **온디바이스 추론** | ONNX Runtime WASM — 개인정보 서버 미전송 |
 | **2단계 탐지** | 서버 DB 우선 조회 → 미등록 시 로컬 모델 fallback |
-| **경고 페이지 리디렉션** | 고위험(≥80%) URL 접속 시 경고 페이지로 전환 |
-| **알림 시스템** | 중위험(≥70%) URL Chrome 알림 |
-| **탐지 이력 관리** | 최근 200건 저장, URL/도메인 중복 방지 |
-| **탭별 승인** | 사용자가 위험 판단 후 수동 승인 가능 |
-| **아이콘 컬러 코딩** | 확률 구간별 실시간 아이콘 색상 표시 |
+| **경고 페이지 리디렉션** | 고위험 URL 접속 시 경고 페이지로 전환 |
+| **Chrome 알림** | 유해 의심 URL 탐지 시 알림 표시 |
+| **탐지 이력 관리** | 일간/주간 통계 · 최근 기록 목록 |
+| **사용자 설정** | 알림/차단 임계값 조정, 다크 모드 |
+| **탭별 승인** | 위험 판단 후 수동 승인으로 계속 접속 가능 |
 
 ---
 
@@ -74,7 +109,7 @@ Storage           chrome.storage.local / session
 
 ## 특성 추출 (80개)
 
-`content.js`에서 Shannon Entropy 기반으로 URL과 HTML DOM을 분석합니다.
+`content.js`에서 Shannon Entropy 기반으로 URL과 HTML DOM을 실시간 분석합니다.
 
 **URL 특성 (~30개)**
 - URL 엔트로피, 문자 비율, HTTPS 여부, 길이 계열
@@ -91,53 +126,57 @@ Storage           chrome.storage.local / session
 
 ---
 
+## Manifest V3 설계 포인트
+
+Chrome MV3 Service Worker는 DOM에 직접 접근할 수 없어 ONNX Runtime WASM을 직접 실행할 수 없습니다.  
+**Offscreen Document**를 활용해 이 제약을 해결했습니다.
+
+```
+Service Worker (background.js)
+  └─ chrome.offscreen.createDocument()
+       └─ Offscreen Document (offscreen.js)
+             └─ ort.InferenceSession.create() — WASM 추론
+```
+
+모델 준비 상태는 PING/PONG 메시지로 확인 후 추론 요청을 전달합니다 (최대 60초 대기).
+
+---
+
 ## 프로젝트 구조
 
 ```
-확장프로그램_v2/
+Chrome_Extension_Pillsang_AI/
 ├── manifest.json          # Manifest V3 설정
-├── background.js          # Service Worker (탐지 로직, API 통신)
+├── background.js          # Service Worker (탐지 로직, API 통신, 아이콘 제어)
 ├── content.js             # 특성 추출 (URL + HTML 80개)
 ├── offscreen.js           # ONNX Runtime 추론 (Offscreen Document)
 ├── offscreen.html         # Offscreen Document 진입점
-├── popup.html / popup.js / popup.css  # 확장 팝업 UI
-├── warning.html / warning.js          # 고위험 경고 페이지
+├── popup.html             # 확장 팝업 UI
+├── popup.js               # 팝업 로직 (결과 표시, 탭 전환)
+├── popup.css              # 팝업 스타일
+├── warning.html           # 고위험 경고 페이지
+├── warning.js             # 경고 페이지 로직 (승인/차단)
 ├── model/
 │   └── CatBoost_merged.onnx  # 변환된 추론 모델
 ├── lib/
 │   ├── ort.min.js            # ONNX Runtime Web
 │   ├── ort-wasm-simd.wasm
 │   └── ort-wasm.wasm
-└── icons/                    # 확장 아이콘 및 캐릭터 이미지
+├── icons/                    # 확장 아이콘 및 상태별 캐릭터 이미지
+└── assets/screenshots/       # 기능 스크린샷
 ```
-
----
-
-## Manifest V3 설계 포인트
-
-Chrome MV3에서는 Service Worker가 DOM에 직접 접근할 수 없습니다.  
-ONNX Runtime WASM을 Service Worker 내에서 실행할 수 없는 제약을 **Offscreen Document**로 해결했습니다.
-
-```
-Service Worker (background.js)
-  └─ chrome.offscreen.createDocument()
-       └─ Offscreen Document (offscreen.js)
-             └─ ort.InferenceSession (WASM 추론)
-```
-
-모델 준비 상태는 PING/PONG 메시지로 확인 후 추론 요청을 전달합니다.
 
 ---
 
 ## 개발 환경 설정
 
 ```bash
-git clone https://github.com/hazzyAI/pillsang-phishing-extension.git
-cd pillsang-phishing-extension
+git clone https://github.com/hazzyAI/Chrome_Extension_Pillsang_AI.git
+cd Chrome_Extension_Pillsang_AI
 npm install   # obfuscation 도구 설치 (선택)
 ```
 
-Chrome에서 로드:
+Chrome에서 직접 로드:
 1. `chrome://extensions` 접속
 2. **개발자 모드** 활성화
 3. **압축해제된 확장 프로그램 로드** → 프로젝트 루트 폴더 선택
@@ -146,7 +185,7 @@ Chrome에서 로드:
 
 ## 관련 프로젝트
 
-- **싹다잡아 Android** — 동일 모델 탑재, 누적 다운로드 50만+ ([Google Play](https://play.google.com/store))
+- **싹다잡아 Android** — 동일 CatBoost 모델 탑재, 누적 다운로드 50만+ (Google Play)
 - **필상 (Pillsang)** — 피싱 탐지 보안 스타트업
 
 ---
