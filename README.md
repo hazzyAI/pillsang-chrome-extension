@@ -79,6 +79,85 @@
 
 ---
 
+## 서버 연동
+
+탐지 1단계에서 자체 서버 DB와 통신하여 화이트리스트/블랙리스트를 조회합니다.
+
+```
+POST https://s-www.pillsang.kr/api/select-list
+
+Request Body:
+  { full_url, full_domain, main_domain }
+
+Response:
+  { is_exist: bool, list: "white" | "black" | "" }
+
+결과 처리:
+  is_exist = false  → 2단계(로컬 ONNX 추론)로 fallback
+  list = "white"    → prob 0 (안전)
+  list = "black"    → prob 1 (위험)
+```
+
+서버 미응답·오류 시에도 로컬 모델 추론으로 자동 fallback하여 탐지 누락을 방지합니다.
+
+---
+
+## 보안 설계
+
+### API 인증 — HMAC-SHA256
+
+서버 API 호출 시 매 요청마다 서명을 생성하여 위변조를 방지합니다.
+
+```
+서명 구조:
+  message   = timestamp (Unix) + nonce (UUID v4)
+  signature = HMAC-SHA256(SECRET_KEY, message)
+
+전송 헤더:
+  X-EXT-TIMESTAMP  : Unix timestamp
+  X-EXT-NONCE      : 무작위 UUID
+  X-EXT-SIGNATURE  : hex 인코딩된 HMAC 서명
+
+구현: Web Crypto API (crypto.subtle.sign) — 외부 라이브러리 없음
+```
+
+SECRET_KEY는 소스에 포함하지 않으며, 배포 빌드 시 환경변수로 주입됩니다.
+
+---
+
+### JS 난독화
+
+배포 전 `javascript-obfuscator`로 소스 코드를 보호합니다 (`npm run obfuscate`).
+
+| 옵션 | 설정 | 효과 |
+|------|------|------|
+| `controlFlowFlattening` | `true` (threshold 0.5) | 제어 흐름 평탄화로 로직 역분석 방지 |
+| `stringArray` + `base64` | `threshold 0.75` | 문자열 상수를 Base64 인코딩된 배열로 분리 |
+| `deadCodeInjection` | `threshold 0.2` | 더미 코드 삽입으로 분석 복잡도 증가 |
+| `selfDefending` | `true` | 난독화 코드 포맷팅·변조 시 동작 불능 |
+| `identifierNamesGenerator` | `hexadecimal` | 변수·함수명을 hex 형식으로 치환 |
+
+난독화 대상: `background.js`, `content.js`, `popup.js`, `offscreen.js`, `warning.js`  
+출력 경로: `dist/` (배포 패키지에 사용)
+
+---
+
+## ML 모델
+
+| 항목 | 내용 |
+|------|------|
+| 알고리즘 | CatBoost (Gradient Boosting) |
+| 입력 | 80차원 float32 벡터 (URL + HTML 특성) |
+| 출력 | 악성 확률 0.0 ~ 1.0 |
+| 변환 | Python CatBoost → ONNX (`catboost.export_model`) |
+| 추론 환경 | ONNX Runtime Web (WASM, 단일 스레드) |
+| 모델 파일 | `model/CatBoost_merged.onnx` (약 2.9 MB) |
+| 기원 | 싹다잡아 Android 앱 탑재 모델과 동일 |
+
+서버·외부로 특성 벡터를 전송하지 않으며, 추론은 전적으로 기기 내에서 수행됩니다.
+
+---
+
 ## 주요 기능
 
 | 기능 | 설명 |
@@ -102,6 +181,7 @@ ML Model          CatBoost → ONNX 변환
 Inference         ONNX Runtime Web (WASM, 단일 스레드)
 Feature Eng.      URL 특성 + HTML DOM 특성 총 80개
 API Auth          HMAC-SHA256 (Web Crypto API)
+Obfuscation       javascript-obfuscator (배포 빌드)
 Storage           chrome.storage.local / session
 ```
 
@@ -156,6 +236,7 @@ Chrome_Extension_Pillsang_AI/
 ├── popup.css              # 팝업 스타일
 ├── warning.html           # 고위험 경고 페이지
 ├── warning.js             # 경고 페이지 로직 (승인/차단)
+├── obfuscate.js           # 배포용 난독화 스크립트
 ├── model/
 │   └── CatBoost_merged.onnx  # 변환된 추론 모델
 ├── lib/
@@ -173,7 +254,8 @@ Chrome_Extension_Pillsang_AI/
 ```bash
 git clone https://github.com/hazzyAI/Chrome_Extension_Pillsang_AI.git
 cd Chrome_Extension_Pillsang_AI
-npm install   # obfuscation 도구 설치 (선택)
+npm install              # 난독화 도구 설치
+npm run obfuscate        # dist/ 에 난독화 파일 생성
 ```
 
 Chrome에서 직접 로드:
