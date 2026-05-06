@@ -20,11 +20,11 @@
 
 | 안전 (0~20%) | 비교적 안전 (21~50%) |
 |:---:|:---:|
-| ![safe](assets/screenshots/01_popup_safe.png) | ![safe_26](assets/screenshots/03_popup_safe_26.png) |
+| ![safe](assets/screenshots/01.png) | ![safe_26](assets/screenshots/03.png) |
 
 | 유해 의심 (51~70%) | 유해 사이트 (71%+) |
 |:---:|:---:|
-| ![suspect](assets/screenshots/04_popup_suspect.png) | ![danger](assets/screenshots/05_popup_danger.png) |
+| ![suspect](assets/screenshots/04.png) | ![danger](assets/screenshots/05.png) |
 
 ---
 
@@ -32,7 +32,7 @@
 
 | Chrome 알림 (기본 임계값 70%+) | 경고 페이지 (기본 임계값 80%+) |
 |:---:|:---:|
-| ![notification](assets/screenshots/06_notification.png) | ![warning](assets/screenshots/07_warning_page.png) |
+| ![notification](assets/screenshots/06.png) | ![warning](assets/screenshots/07.png) |
 
 ---
 
@@ -40,7 +40,7 @@
 
 | 탐지 이력 (일간/주간 통계) | 설정 탭 |
 |:---:|:---:|
-| ![history](assets/screenshots/08_history_daily.png) | ![settings](assets/screenshots/11_settings.png) |
+| ![history](assets/screenshots/08.png) | ![settings](assets/screenshots/11.png) |
 
 ---
 
