@@ -3,7 +3,18 @@
 > AI 기반 실시간 피싱·유해 사이트 탐지 크롬 확장 프로그램  
 > Chrome Web Store 심사 제출 완료 · 출시 예정
 
-방문하는 모든 URL을 실시간으로 분석하여 **서버 DB 조회(화이트/블랙리스트) → 온디바이스 ONNX 추론**의 2단계로 피싱·유해 사이트를 탐지합니다.
+[![Status](https://img.shields.io/badge/Status-심사_중-blue?style=flat-square)]()
+[![Model](https://img.shields.io/badge/Model-CatBoost_ONNX-FFCC00?style=flat-square)]()
+[![Runtime](https://img.shields.io/badge/Runtime-Manifest_V3-4285F4?style=flat-square&logo=googlechrome&logoColor=white)]()
+
+> 코드는 상업 서비스 보안상 비공개입니다.
+
+---
+
+## 개요
+
+방문하는 모든 URL을 실시간으로 분석하여 **서버 DB 조회 → 온디바이스 ONNX 추론**의 2단계로 피싱·유해 사이트를 탐지합니다.
+서버 API 2개(조회 / 적재)를 연동하여 탐지 결과를 DB에 누적함으로써, 신규 사이트가 지속적으로 화이트/블랙리스트에 편입되는 구조를 갖추고 있습니다.
 
 ---
 
@@ -13,12 +24,12 @@
 사용자가 URL 접속
        │
        ▼
-[content.js] URL + HTML 특성 80개 추출
+[content.js] URL + HTML 특성 추출
        │
        ▼
 [background.js] Service Worker
        │
-       ├─ 1단계: 서버 DB 조회 (화이트/블랙리스트)
+       ├─ 1단계: 서버 DB 조회 API (화이트/블랙리스트)
        │         ├─ 화이트리스트 → 안전 표시 (prob = 0%)
        │         └─ 블랙리스트  → 위험 표시 (prob = 100%)
        │
@@ -27,221 +38,71 @@
                            │
                            ▼
                     악성 확률 0.0 ~ 1.0 반환
-
-────────────────────────────────────────
-팝업 표시 상태
-  0  ~ 20% → 🟢 안전
-  21 ~ 50% → 🔵 비교적 안전
-  51 ~ 70% → 🟠 유해 의심
-  71%+     → 🔴 유해 사이트
-
-액션 (사용자 설정 가능)
-  ≥ 70% (기본) → Chrome 알림 표시
-  ≥ 80% (기본) → 경고 페이지 리디렉션
+                           │
+                           ▼
+                 서버 DB 적재 API → 결과 저장
+                 (신규 URL 화이트/블랙리스트 편입)
 ```
 
 ---
 
-## 주요 화면
+## 서버 API 연동
 
-### 안전 — 서버 DB 화이트리스트 확인 / 모델 추론 안전
+| API | 방식 | 역할 |
+|-----|------|------|
+| **DB 조회 API** | `GET` | 접속 URL이 화이트/블랙리스트에 등록되어 있는지 조회 |
+| **DB 적재 API** | `POST` | ONNX 추론 결과를 서버에 저장, 임계값 이상 시 블랙리스트 자동 편입 |
 
-| 화이트리스트 안전 (prob 0%) | 모델 추론 안전 (0~20%) | 비교적 안전 (21~50%) |
-|:---:|:---:|:---:|
-| ![whitelist_safe](assets/screenshots/01.png) | ![model_safe](assets/screenshots/02.png) | ![safe_26](assets/screenshots/03.png) |
-
-- **화이트리스트 안전**: 서버 DB에 등록된 신뢰 도메인 — 모델 추론 없이 즉시 안전 판정
-- **모델 추론 안전**: 서버 DB 미등록 → 로컬 ONNX 추론 결과 0~20%
-- **비교적 안전**: 추론 결과 21~50%, 주의 권고
+> 두 API 모두 서버 전문가와 협업하여 설계 · 연동하였으며, 통신 보안 처리를 적용했습니다.
 
 ---
 
-### 유해 의심 (51~70%) — 팝업 + Chrome 알림
+## 팝업 표시 상태
 
-| 확장 팝업 (74.3%) | Chrome 알림 (≥70% 기본 임계값) |
-|:---:|:---:|
-| ![suspect_popup](assets/screenshots/06.png) | ![notification](assets/screenshots/04.png) |
-
-- 팝업에 악성 확률과 상세 특성 분석 결과 표시
-- 탐지 즉시 Chrome 시스템 알림으로 사용자에게 경고
-- 알림 임계값은 설정 탭에서 조정 가능 (기본 70%)
-
----
-
-### 유해 사이트 (71%+) — 팝업 + 경고 페이지 리디렉션
-
-| 확장 팝업 (85.7%) | 경고 페이지 (≥80% 기본 임계값) |
-|:---:|:---:|
-| ![danger_popup](assets/screenshots/07.png) | ![warning_page](assets/screenshots/05.png) |
-
-- 고위험 URL 접속 시 원래 페이지 대신 경고 페이지로 자동 리디렉션
-- 경고 페이지에서 **수동 승인** 후 계속 접속하거나 **뒤로 가기** 선택 가능
-- 차단 임계값은 설정 탭에서 조정 가능 (기본 80%)
+| 악성 확률 | 표시 | 상태 |
+|-----------|------|------|
+| 0 ~ 20% | 🟢 | 안전 |
+| 21 ~ 50% | 🔵 | 비교적 안전 |
+| 51 ~ 70% | 🟠 | 유해 의심 |
+| 71%+ | 🔴 | 유해 사이트 |
 
 ---
 
-### 탐지 이력
+## 자동 액션 (사용자 설정 가능)
 
-#### 일간 통계
-
-![history_daily](assets/screenshots/08.png)
-
-시간대별 탐지 건수를 막대 그래프로 표시합니다. 당일 안전/위험 비율을 한눈에 파악할 수 있습니다.
-
-#### 주간 통계
-
-![history_weekly](assets/screenshots/09.png)
-
-최근 7일간 일별 탐지 현황을 표시합니다. 특정 날짜에 위험 사이트 접속이 집중됐는지 추적할 수 있습니다.
-
-#### 최근 탐지 목록
-
-![history_list](assets/screenshots/10.png)
-
-방문한 URL별 악성 확률과 탐지 시각을 목록으로 확인할 수 있습니다.
+| 임계값 | 기본값 | 동작 |
+|--------|--------|------|
+| 확률 ≥ 70% | ✅ 활성 | Chrome 알림 표시 |
+| 확률 ≥ 80% | ✅ 활성 | 경고 페이지 리디렉션 |
 
 ---
 
-### 설정
+## 기술 구성
 
-![settings](assets/screenshots/11.png)
-
-| 설정 항목 | 기본값 | 설명 |
-|-----------|--------|------|
-| **탐지 기능** | ON | 전체 탐지 활성화/비활성화 |
-| **알림 임계값** | 70% | 이 값 이상이면 Chrome 알림 표시 |
-| **차단 임계값** | 80% | 이 값 이상이면 경고 페이지로 리디렉션 |
-| **알림 표시** | ON | Chrome 시스템 알림 허용 여부 |
-| **경고 페이지** | ON | 고위험 URL 차단 페이지 활성화 여부 |
-| **다크 모드** | 시스템 따름 | 팝업 UI 테마 |
+| 구성 요소 | 설명 |
+|-----------|------|
+| `content.js` | 페이지 로드 시 특성 추출, background로 전달 |
+| `background.js` | Service Worker — API 조회 / ONNX 추론 흐름 제어 |
+| `offscreen.js` | Offscreen Document — ONNX WASM 런타임 실행 |
+| `popup.js` | 탐지 결과 UI 렌더링 |
+| `CatBoost ONNX` | WASM 기반 온디바이스 추론 (네트워크 불필요) |
 
 ---
 
-## 서버 연동
+## 스크린샷
 
-탐지 1단계에서 자체 서버 DB와 통신하여 화이트리스트/블랙리스트를 조회합니다.
-
-- 등록된 도메인은 DB 결과만으로 즉시 안전/위험 판정
-- 미등록 도메인은 로컬 ONNX 모델 추론으로 fallback
-- 서버 미응답·오류 시에도 로컬 추론으로 자동 전환하여 탐지 누락 방지
-
-모든 API 요청은 **서명 기반 인증**을 적용하여 위변조·재전송 공격을 방지합니다.  
-인증 구현에는 외부 라이브러리 없이 브라우저 내장 Web Crypto API를 사용합니다.
+<div align="center">
+<img src="assets/screenshots/01.png" width="180">
+<img src="assets/screenshots/02.png" width="180">
+<img src="assets/screenshots/03.png" width="180">
+<img src="assets/screenshots/04.png" width="180">
+</div>
 
 ---
 
-## ML 모델
+## 개발 특이사항
 
-| 항목 | 내용 |
-|------|------|
-| 알고리즘 | CatBoost (Gradient Boosting) |
-| 입력 | 80차원 float32 벡터 (URL + HTML 특성) |
-| 출력 | 악성 확률 0.0 ~ 1.0 |
-| 변환 | Python CatBoost → ONNX |
-| 추론 환경 | ONNX Runtime Web (WASM, 단일 스레드) |
-
-개인정보 보호를 위해 특성 벡터를 외부 서버로 전송하지 않으며, 추론은 전적으로 기기 내에서 수행됩니다.
-
----
-
-## 특성 추출 (80개)
-
-`content.js`에서 Shannon Entropy 기반으로 URL과 HTML DOM을 실시간 분석합니다.
-
-**URL 특성 (~30개)**
-- URL 엔트로피, 문자 비율, HTTPS 여부, 길이 계열
-- 서브도메인 수/길이, TLD 엔트로피
-- 경로 깊이, 쿼리 파라미터 키/값 엔트로피
-- 컴포넌트별 최대·평균 엔트로피
-
-**HTML 특성 (~50개)**
-- 태그 수, 링크 수, 내부/외부 링크 비율
-- 인라인 스크립트 수, Base64 문자열 수
-- 폼·입력 필드 수, hidden input 비율
-- DOM 분기 계수, 반복 서브트리 비율
-- HTML 전체 문자/라인 엔트로피
-
----
-
-## Manifest V3 설계 포인트
-
-Chrome MV3 Service Worker는 DOM에 직접 접근할 수 없어 ONNX Runtime WASM을 직접 실행할 수 없습니다.  
-**Offscreen Document**를 활용해 이 제약을 해결했습니다.
-
-```
-Service Worker (background.js)
-  └─ chrome.offscreen.createDocument()
-       └─ Offscreen Document (offscreen.js)
-             └─ ort.InferenceSession.create() — WASM 추론
-```
-
-모델 준비 상태는 PING/PONG 메시지로 확인 후 추론 요청을 전달합니다 (최대 60초 대기).
-
----
-
-## 기술 스택
-
-```
-Chrome Extension  Manifest V3
-ML Model          CatBoost → ONNX 변환
-Inference         ONNX Runtime Web (WASM, 단일 스레드)
-Feature Eng.      URL 특성 + HTML DOM 특성 총 80개
-API Auth          서명 기반 인증 (Web Crypto API)
-Storage           chrome.storage.local / session
-```
-
----
-
-## 프로젝트 구조
-
-```
-Chrome_Extension_Pillsang_AI/
-├── manifest.json          # Manifest V3 설정
-├── background.js          # Service Worker (탐지 로직, API 통신, 아이콘 제어)
-├── content.js             # 특성 추출 (URL + HTML 80개)
-├── offscreen.js           # ONNX Runtime 추론 (Offscreen Document)
-├── offscreen.html         # Offscreen Document 진입점
-├── popup.html             # 확장 팝업 UI
-├── popup.js               # 팝업 로직 (결과 표시, 탭 전환)
-├── popup.css              # 팝업 스타일
-├── warning.html           # 고위험 경고 페이지
-├── warning.js             # 경고 페이지 로직 (승인/차단)
-├── model/
-│   └── CatBoost_merged.onnx  # 추론 모델
-├── lib/
-│   ├── ort.min.js            # ONNX Runtime Web
-│   ├── ort-wasm-simd.wasm
-│   └── ort-wasm.wasm
-├── icons/                    # 확장 아이콘 및 상태별 캐릭터 이미지
-└── assets/screenshots/       # 기능 스크린샷
-```
-
----
-
-## 개발 환경 설정
-
-```bash
-git clone https://github.com/hazzyAI/Chrome_Extension_Pillsang_AI.git
-cd Chrome_Extension_Pillsang_AI
-```
-
-Chrome에서 직접 로드:
-1. `chrome://extensions` 접속
-2. **개발자 모드** 활성화
-3. **압축해제된 확장 프로그램 로드** → 프로젝트 루트 폴더 선택
-
----
-
-## 관련 프로젝트
-
-- **싹다잡아 Android** — 누적 다운로드 50만+ (Google Play)
-- **필상 (Pillsang)** — 피싱 탐지 보안 스타트업
-
----
-
-## 라이선스
-
-본 프로젝트는 포트폴리오 목적으로 공개합니다.  
-상업적 이용 및 모델 파일 재배포는 금지합니다.
-
-© 2025 Jungmin Ha · 필상
+- **Manifest V3** 기반 — Service Worker + Offscreen Document 구조로 ONNX WASM 실행
+- **온디바이스 추론** — 모델이 클라이언트에 탑재되어 네트워크 없이 추론 가능
+- **DB 피드백 루프** — 추론 결과를 서버에 누적하여 화이트/블랙리스트 지속 갱신
+- **단독 개발** — 기획 · 모델 설계 · 확장프로그램 개발 · API 연동 · 심사 제출 전 과정 수행
