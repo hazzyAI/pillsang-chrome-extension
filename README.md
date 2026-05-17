@@ -91,11 +91,57 @@
 
 ## 스크린샷
 
+### 팝업 · 보안 탭 — 4단계 탐지 결과
+
+> DB 등록 URL은 즉시 결과를 반환하고, 미등록 URL은 온디바이스 AI 추론을 거쳐 4단계로 판정합니다.
+
+<table>
+  <tr>
+    <td align="center"><img src="assets/screenshots/01.png" width="160"><br><b>🟢 안전</b><br><sub>DB 등록 URL · 즉시 반환<br>(악성 확률 0%)</sub></td>
+    <td align="center"><img src="assets/screenshots/02.png" width="160"><br><b>🟢 안전</b><br><sub>AI 추론 결과 안전<br>(악성 확률 15.5%)</sub></td>
+    <td align="center"><img src="assets/screenshots/03.png" width="160"><br><b>🔵 비교적 안전</b><br><sub>AI 추론 결과<br>(악성 확률 26.7%)</sub></td>
+    <td align="center"><img src="assets/screenshots/06.png" width="160"><br><b>🟠 유해 의심</b><br><sub>AI 추론 결과<br>(악성 확률 74.3%)</sub></td>
+    <td align="center"><img src="assets/screenshots/07.png" width="160"><br><b>🔴 유해 사이트</b><br><sub>AI 추론 결과<br>(악성 확률 85.7%)</sub></td>
+  </tr>
+</table>
+
+---
+
+### 자동 액션 — 임계값 초과 시 자동 대응
+
+> 사용자가 설정한 임계값을 초과하면 Chrome 알림과 차단 페이지가 자동으로 동작합니다.
+
+<table>
+  <tr>
+    <td align="center"><img src="assets/screenshots/04.png" width="380"><br><b>⚠️ Chrome 알림</b><br><sub>악성 확률 ≥ 70% · 개인정보 입력 주의 알림</sub></td>
+    <td align="center"><img src="assets/screenshots/05.png" width="380"><br><b>🚫 유해 사이트 차단 페이지</b><br><sub>악성 확률 ≥ 80% · 경고 페이지로 자동 리다이렉트</sub></td>
+  </tr>
+</table>
+
+---
+
+### 히스토리 탭 — 탐지 이력 및 통계
+
+> 방문한 URL의 탐지 결과를 일간/주간으로 집계하고, 위험 URL만 필터링하여 확인할 수 있습니다.
+
+<table>
+  <tr>
+    <td align="center"><img src="assets/screenshots/08.png" width="210"><br><b>📊 일간 통계</b><br><sub>도넛 차트 + 최근 탐지 기록<br>(총 28건)</sub></td>
+    <td align="center"><img src="assets/screenshots/09.png" width="210"><br><b>📊 주간 통계</b><br><sub>누적 분석 결과<br>(총 116건)</sub></td>
+    <td align="center"><img src="assets/screenshots/10.png" width="210"><br><b>🔴 위험 URL 필터</b><br><sub>유해 사이트만 선별 표시<br>(7건 · 85~86%)</sub></td>
+  </tr>
+</table>
+
+---
+
+### 설정 탭 — 사용자 맞춤 설정
+
+> 알림 임계값, 차단 임계값, 다크 모드를 개별적으로 조정할 수 있습니다.
+
 <div align="center">
-<img src="assets/screenshots/01.png" width="180">
-<img src="assets/screenshots/02.png" width="180">
-<img src="assets/screenshots/03.png" width="180">
-<img src="assets/screenshots/04.png" width="180">
+<img src="assets/screenshots/11.png" width="220"><br>
+<b>⚙️ 알림 · 차단 · 다크모드 설정</b><br>
+<sub>알림 임계값(기본 70%) · 차단 임계값(기본 80%) · 다크 모드 ON/OFF · 히스토리 초기화</sub>
 </div>
 
 ---
