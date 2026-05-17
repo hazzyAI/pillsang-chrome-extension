@@ -99,14 +99,11 @@
 
 <table>
   <tr>
-    <td align="center"><img src="assets/screenshots/01.png" width="150"><br><b>🟢 안전</b><br><sub>화이트리스트 등록 URL<br>즉시 반환 (확률 0%)</sub></td>
+    <td align="center"><img src="assets/screenshots/01.png" width="150"><br><b>🗄️ DB 등록 URL</b><br><sub>화이트리스트 → 확률 0%<br>블랙리스트 → 확률 100%<br>즉시 결과 반환</sub></td>
     <td align="center"><img src="assets/screenshots/02.png" width="150"><br><b>🟢 안전</b><br><sub>AI 추론 결과<br>(확률 0 ~ 20%)</sub></td>
     <td align="center"><img src="assets/screenshots/03.png" width="150"><br><b>🔵 비교적 안전</b><br><sub>AI 추론 결과<br>(확률 21 ~ 50%)</sub></td>
     <td align="center"><img src="assets/screenshots/06.png" width="150"><br><b>🟠 유해 의심</b><br><sub>AI 추론 결과<br>(확률 51 ~ 80%)</sub></td>
     <td align="center"><img src="assets/screenshots/07.png" width="150"><br><b>🔴 유해 사이트</b><br><sub>AI 추론 결과<br>(확률 81%+)</sub></td>
-  </tr>
-  <tr>
-    <td colspan="5" align="center"><sub>⚠️ 블랙리스트 등록 URL의 경우 DB 조회 후 즉시 유해 사이트로 판정 (확률 100%) · 자동 차단 페이지 표시</sub></td>
   </tr>
 </table>
 
