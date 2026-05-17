@@ -20,29 +20,9 @@
 
 ## 탐지 아키텍처
 
-```
-사용자가 URL 접속
-       │
-       ▼
-[content.js] URL + HTML 특성 추출
-       │
-       ▼
-[background.js] Service Worker
-       │
-       ├─ 1단계: 서버 DB 조회 API (화이트/블랙리스트)
-       │         ├─ 화이트리스트 → 안전 표시 (prob = 0%)
-       │         └─ 블랙리스트  → 위험 표시 (prob = 100%)
-       │
-       └─ 2단계: DB 미등록 → 로컬 ONNX 추론
-                 └─ [offscreen.js] Boosting Model ONNX (WASM)
-                           │
-                           ▼
-                    악성 확률 0.0 ~ 1.0 반환
-                           │
-                           ▼
-                 서버 DB 적재 API → 결과 저장
-                 (추후 라벨링 → 모델 재학습 데이터로 활용)
-```
+<div align="center">
+<img src="assets/architecture.png" width="720">
+</div>
 
 ---
 
