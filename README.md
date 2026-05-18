@@ -6,6 +6,7 @@
 [![Status](https://img.shields.io/badge/Status-심사_중-blue?style=flat-square)]()
 [![Model](https://img.shields.io/badge/Model-Boosting_Model_ONNX-FFCC00?style=flat-square)]()
 [![Runtime](https://img.shields.io/badge/Runtime-Manifest_V3-4285F4?style=flat-square&logo=googlechrome&logoColor=white)]()
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)]()
 
 > 코드는 상업 서비스 보안상 비공개입니다.
 
@@ -13,8 +14,24 @@
 
 ## 개요
 
-방문하는 모든 URL을 실시간으로 분석하여 **서버 DB 조회 → 온디바이스 ONNX 추론**의 2단계로 피싱·유해 사이트를 탐지합니다.  
-서버 API 2개(조회 / 적재)를 연동하며, 추론 결과를 DB에 지속 누적합니다. 수집된 데이터는 추후 라벨링 과정을 거쳐 모델 재학습에 활용되며, 이를 통해 탐지 성능을 지속적으로 개선하는 구조를 갖추고 있습니다.
+방문하는 모든 URL을 실시간으로 분석하여 **서버 DB 조회 → 온디바이스 ONNX 추론**의 2단계로 피싱·유해 사이트를 탐지합니다.
+
+- **1단계 (서버 DB 조회)**: 화이트/블랙리스트에 등록된 URL은 AI 추론 없이 즉시 결과를 반환합니다. 불필요한 추론 단계를 생략해 응답 속도를 최소화합니다.
+- **2단계 (온디바이스 AI 추론)**: 미등록 URL은 ONNX WASM 모델로 브라우저 내에서 직접 추론합니다. 개인 브라우징 데이터가 외부 서버로 전송되지 않아 프라이버시를 보호합니다.
+- **데이터 파이프라인**: 추론 결과는 서버 DB에 누적 수집되며, 라벨링 후 모델 재학습에 활용해 탐지 성능을 지속적으로 개선하는 구조입니다.
+
+---
+
+## 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| 🔍 **2단계 실시간 탐지** | 서버 DB 조회 → 온디바이스 AI 추론으로 모든 URL 실시간 분석 |
+| ⚡ **즉시 판별** | 화이트/블랙리스트 등록 URL은 AI 추론 없이 즉시 결과 반환 |
+| 🧠 **온디바이스 AI** | ONNX WASM — 외부 서버 통신 없이 브라우저 내 실시간 추론 |
+| 🔔 **자동 알림 · 차단** | 임계값 초과 시 Chrome 알림 + 유해 사이트 차단 페이지 자동 리디렉션 |
+| 📊 **탐지 히스토리** | 일간 / 주간 통계 도넛 차트 + 판정별 카테고리 필터링 |
+| ⚙️ **맞춤 설정** | 알림 · 차단 임계값 슬라이더 개별 조정, 다크모드, 히스토리 초기화 |
 
 ---
 
@@ -28,7 +45,7 @@
 
 ## 보안 탭 — 6가지 판정 케이스
 
-화이트/블랙리스트 등록 URL은 DB 조회 후 즉시 결과를 반환하고, 미등록 URL은 온디바이스 AI 추론을 거쳐 확률에 따라 4단계로 판정합니다.
+화이트/블랙리스트 등록 URL은 DB 조회 후 즉시 결과를 반환하고, 미등록 URL은 온디바이스 AI 추론을 거쳐 악성 확률에 따라 4단계로 판정합니다.
 
 | 케이스 | 악성 확률 | 판정 |
 |--------|-----------|------|
@@ -99,8 +116,8 @@
 
 | API | 방식 | 역할 |
 |-----|------|------|
-| **DB 조회 API** | `GET` | 접속 URL이 화이트/블랙리스트에 등록되어 있는지 조회 |
-| **DB 적재 API** | `POST` | ONNX 추론 결과(URL · 특성 · 예측값)를 서버 DB에 저장 · 수집 데이터는 추후 라벨링을 거쳐 모델 재학습에 활용 |
+| **DB 조회 API** | `GET` | 접속 URL의 화이트 / 블랙리스트 등록 여부 조회 후 즉시 결과 반환 |
+| **DB 적재 API** | `POST` | ONNX 추론 결과(URL · 특성 · 예측값)를 서버 DB에 저장 — 수집 데이터는 추후 라벨링 후 모델 재학습에 활용 |
 
 > 두 API 모두 서버 전문가와 협업하여 설계 · 연동하였으며, JS 난독화 및 암호화를 적용하여 보안 처리했습니다 (세부 기법 비공개).
 
@@ -108,20 +125,22 @@
 
 ## 기술 구성
 
-| 구성 요소 | 설명 |
+| 구성 요소 | 역할 |
 |-----------|------|
-| `content.js` | 페이지 로드 시 URL + HTML 특성 추출, background로 전달 |
-| `background.js` | Service Worker — DB 조회 API 호출 / ONNX 추론 흐름 제어 |
-| `offscreen.js` | Offscreen Document — Boosting Model ONNX WASM 런타임 실행 |
-| `popup.js` | 탐지 결과 UI 렌더링 (보안 / 히스토리 / 설정 탭) |
-| `Boosting Model ONNX` | WASM 기반 온디바이스 추론 (네트워크 불필요) |
+| `content.js` | 페이지 로드 시 URL + HTML 특성 추출 후 background로 전달 |
+| `background.js` | Service Worker — DB 조회 API 호출 및 ONNX 추론 흐름 총괄 제어 |
+| `offscreen.js` | Offscreen Document — Boosting Model ONNX WASM 런타임 실행 (MV3 제약 우회) |
+| `popup.js` | 탐지 결과 UI 렌더링 — 보안 · 히스토리 · 설정 3탭 구성 |
+| `Boosting Model ONNX` | WASM 기반 온디바이스 추론 모델 — 네트워크 없이 브라우저 내 실행 |
+
+> Manifest V3의 Service Worker는 백그라운드 지속 실행이 불가하므로, ONNX WASM 런타임은 Offscreen Document를 통해 별도 격리 환경에서 실행합니다.
 
 ---
 
 ## 개발 특이사항
 
-- **Manifest V3** 기반 — Service Worker + Offscreen Document 구조로 ONNX WASM 실행
-- **온디바이스 추론** — 모델이 클라이언트에 탑재되어 네트워크 없이 추론 가능
-- **데이터 수집 파이프라인** — 추론 결과를 서버 DB에 누적하여 추후 라벨링 후 모델 재학습에 활용, 탐지 성능 지속 개선 목적
+- **Manifest V3 구조 설계** — Service Worker + Offscreen Document 조합으로 ONNX WASM 런타임 실행 환경 구성
+- **온디바이스 추론** — 모델이 클라이언트에 탑재되어 외부 서버 전송 없이 브라우저 내 실시간 추론 가능
+- **데이터 수집 파이프라인** — 추론 결과를 서버 DB에 지속 누적하여 추후 라벨링 후 모델 재학습에 활용, 탐지 성능의 점진적 개선을 목표
 - **보안 처리** — JS 난독화 및 암호화 적용 (세부 기법 비공개)
-- **단독 개발** — 기획 · 모델 설계 · 확장프로그램 개발 · API 연동 · 심사 제출 전 과정 수행
+- **단독 개발** — 기획 · 데이터 수집 · 모델 설계 · 확장프로그램 개발 · API 연동 · Chrome Web Store 심사 제출 전 과정 수행
