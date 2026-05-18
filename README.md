@@ -92,9 +92,9 @@
 
 <table>
   <tr>
-    <td align="center"><img src="assets/screenshots/08.png" width="210"><br><b>📊 일간 통계</b><br><sub>도넛 차트 + 최근 탐지 기록<br>(총 28건)</sub></td>
-    <td align="center"><img src="assets/screenshots/09.png" width="210"><br><b>📊 주간 통계</b><br><sub>누적 분석 결과<br>(총 116건)</sub></td>
-    <td align="center"><img src="assets/screenshots/10.png" width="210"><br><b>🔴 카테고리별 조회</b><br><sub>유해 사이트 카테고리 선택 시<br>해당 기록만 표시 (7건)</sub></td>
+    <td align="center"><img src="assets/screenshots/08.png" width="210"><br><b>📊 일간 통계</b><br><sub>도넛 차트 + 판정별 탐지 내역</sub></td>
+    <td align="center"><img src="assets/screenshots/09.png" width="210"><br><b>📊 주간 통계</b><br><sub>일간 데이터 누적 분석 결과</sub></td>
+    <td align="center"><img src="assets/screenshots/10.png" width="210"><br><b>🔴 카테고리별 조회</b><br><sub>판정 카테고리 선택 시 해당 기록만 필터링</sub></td>
   </tr>
 </table>
 

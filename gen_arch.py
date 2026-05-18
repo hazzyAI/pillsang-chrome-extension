@@ -17,7 +17,7 @@ NEU_EC='#5B6BF8'; NEU_FC='#EDEEFF'; NEU_TX='#2C2C8A'
 BLU_EC='#2E86C1'; BLU_FC='#D6EAF8'; BLU_TX='#1A5276'
 AMB_EC='#CA6F1E'; AMB_FC='#FDEBD0'; AMB_TX='#784212'
 GRN_EC='#1E8449'; GRN_FC='#D5F5E3'; GRN_TX='#145A32'
-RED_EC='#A93226'; RED_FC='#E74C3C'; RED_TX='#FFFFFF'   # solid red fill, white text
+RED_EC='#C0392B'; RED_FC='#F5B7B1'; RED_TX='#7B241C'   # light-medium red fill, dark red text
 PUR_EC='#7D3C98'; PUR_FC='#F5EEF8'; PUR_TX='#4A235A'
 INK  ='#1A1A2E'; SUB='#3A3A4A'; ARROW='#44445A'
 
@@ -107,7 +107,7 @@ box(ax, LX, Y_WL, BW, 1.3,
 # ── 3-R: 유해 사이트 (블랙리스트) — solid red ──────────────
 box(ax, RX, Y_BL, BW, 1.3,
     '유해 사이트', sub='확률 100%  ·  즉시 결과 반환',
-    fc=RED_FC, ec=RED_EC, lw=2.8, ts=20, tc=RED_TX, ss=13.5, sc='#FFD6D6')
+    fc=RED_FC, ec=RED_EC, lw=2.8, ts=20, tc=RED_TX, ss=13.5, sc='#7B241C')
 
 # ── 4. 2단계: 온디바이스 AI 추론 ───────────────────────────
 box(ax, CX, Y_AI, MW+3.0, 1.4,
