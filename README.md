@@ -163,7 +163,6 @@ MobileNetV2 기반 NSFW 모델이 웹 페이지 이미지를 실시간 분류해
     <td align="center"><img src="assets/screenshots/08.png" width="200"><br><b>📊 일간 통계</b></td>
     <td align="center"><img src="assets/screenshots/09.png" width="200"><br><b>📊 주간 통계</b></td>
     <td align="center"><img src="assets/screenshots/10.png" width="200"><br><b>🗂️ 카테고리 필터</b></td>
-    <td align="center"><img src="assets/screenshots/11.png" width="200"><br><b>⚙️ 세부 설정</b></td>
   </tr>
 </table>
 
