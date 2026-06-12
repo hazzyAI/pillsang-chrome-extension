@@ -19,25 +19,9 @@
 
 ## 탐지 흐름
 
-```mermaid
-flowchart TD
-    A([🌐 URL 접속]):::start --> B{"DB 조회\n화이트·블랙리스트"}:::dec
-    B -->|화이트| W([✅ 안전]):::safe
-    B -->|블랙| BL([🔴 차단]):::block
-    B -->|미등록| C{"키워드 감지\n성인·도박"}:::dec
-    C -->|감지| K([🚨 경고 전환]):::block
-    C -->|없음| D["HTML → 80피처 → ONNX"]:::proc
-    D -->|≥ 80%| F([🚨 차단 리디렉션]):::block
-    D -->|≥ 70%| G([🔔 알림 발송]):::warn
-    D -->|< 70%| H([📊 팝업 표시]):::safe
-
-    classDef start fill:#6C4FE8,stroke:none,color:#fff,font-weight:700
-    classDef dec   fill:#F0EBFF,stroke:#9575CD,stroke-width:2px,color:#311B92
-    classDef safe  fill:#E8F5E9,stroke:#43A047,stroke-width:2px,color:#1B5E20,font-weight:600
-    classDef block fill:#FFEBEE,stroke:#E53935,stroke-width:2px,color:#B71C1C,font-weight:600
-    classDef warn  fill:#FFFDE7,stroke:#F9A825,stroke-width:2px,color:#E65100,font-weight:600
-    classDef proc  fill:#E3F2FD,stroke:#1E88E5,stroke-width:2px,color:#0D47A1,font-weight:600
-```
+<div align="center">
+<img src="assets/flow_diagram.svg" width="860">
+</div>
 
 ---
 

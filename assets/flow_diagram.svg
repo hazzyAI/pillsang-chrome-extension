@@ -1,0 +1,100 @@
+<svg viewBox="0 0 900 910" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#6366F1"/></marker>
+    <marker id="ag" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#16A34A"/></marker>
+    <marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#DC2626"/></marker>
+    <marker id="ao" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#D97706"/></marker>
+    <marker id="ab" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#2563EB"/></marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="910" rx="20" fill="#F8F6FF"/>
+
+  <!-- ═══ NODE 1: URL 접속 ═══ -->
+  <rect x="255" y="28" width="390" height="54" rx="27" fill="#EFF6FF" stroke="#93C5FD" stroke-width="2"/>
+  <text x="450" y="61" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="19" font-weight="700" fill="#1E40AF">&#x1F310;  사용자가 URL 접속</text>
+
+  <!-- arrow 1→2 -->
+  <line x1="450" y1="82" x2="450" y2="110" stroke="#6366F1" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- ═══ NODE 2: 서버 DB 조회 ═══ -->
+  <rect x="115" y="112" width="670" height="108" rx="22" fill="#FFFBEB" stroke="#F59E0B" stroke-width="2.5"/>
+  <text x="450" y="152" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="22" font-weight="800" fill="#92400E">1단계 : 서버 DB 조회</text>
+  <text x="450" y="178" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="13.5" fill="#A16207">화이트 / 블랙리스트 등록 여부 확인</text>
+  <text x="450" y="201" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12.5" fill="#78350F">등록된 URL 은 AI 추론 없이 즉시 반환</text>
+
+  <!-- left branch: 화이트리스트 → 안전 -->
+  <line x1="262" y1="220" x2="115" y2="288" stroke="#16A34A" stroke-width="2.5" marker-end="url(#ag)"/>
+  <text x="177" y="262" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12.5" font-weight="600" fill="#16A34A">화이트리스트</text>
+
+  <!-- right branch: 블랙리스트 → 차단 -->
+  <line x1="638" y1="220" x2="785" y2="288" stroke="#DC2626" stroke-width="2.5" marker-end="url(#ar)"/>
+  <text x="722" y="262" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12.5" font-weight="600" fill="#DC2626">블랙리스트</text>
+
+  <!-- center spine: 미등록 URL -->
+  <line x1="450" y1="220" x2="450" y2="380" stroke="#7C3AED" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="469" y="258" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12.5" font-weight="600" fill="#7C3AED">미등록 URL</text>
+
+  <!-- ═══ SIDE LEFT: 안전 ═══ -->
+  <rect x="18" y="290" width="194" height="84" rx="17" fill="#F0FDF4" stroke="#22C55E" stroke-width="2"/>
+  <text x="115" y="323" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="19" font-weight="700" fill="#166534">&#x2705;  안전</text>
+  <text x="115" y="346" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" fill="#15803D">확률 0%</text>
+  <text x="115" y="364" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" fill="#15803D">즉시 결과 반환</text>
+
+  <!-- ═══ SIDE RIGHT: 즉시 차단 ═══ -->
+  <rect x="688" y="290" width="194" height="84" rx="17" fill="#FEF2F2" stroke="#EF4444" stroke-width="2"/>
+  <text x="785" y="323" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="19" font-weight="700" fill="#991B1B">&#x1F534;  즉시 차단</text>
+  <text x="785" y="346" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" fill="#B91C1C">확률 100%</text>
+  <text x="785" y="364" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" fill="#B91C1C">즉시 결과 반환</text>
+
+  <!-- ═══ NODE 3: HTML 수집 · 키워드 감지 ═══ -->
+  <rect x="115" y="382" width="670" height="96" rx="22" fill="#EFF6FF" stroke="#60A5FA" stroke-width="2.5"/>
+  <text x="450" y="419" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="20" font-weight="700" fill="#1D4ED8">HTML 수집  ·  80피처 추출</text>
+  <text x="450" y="445" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="13.5" fill="#1E40AF">타이틀 키워드 감지 — 성인 · 도박 30종+</text>
+  <text x="450" y="467" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12.5" fill="#3B82F6">키워드 감지 시 → 경고 페이지 즉시 전환</text>
+
+  <!-- arrow 3→4 -->
+  <line x1="450" y1="478" x2="450" y2="506" stroke="#6366F1" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- ═══ NODE 4: ONNX 추론 ═══ -->
+  <rect x="115" y="508" width="670" height="108" rx="22" fill="#EDE9FE" stroke="#8B5CF6" stroke-width="2.5"/>
+  <text x="450" y="548" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="22" font-weight="800" fill="#5B21B6">2단계 : 온디바이스 AI 추론</text>
+  <text x="450" y="574" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="13.5" fill="#6D28D9">Boosting Model ONNX  ·  WASM 기반 (네트워크 불필요)</text>
+  <text x="450" y="598" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12.5" fill="#7C3AED">악성 확률 산출  →  임계값 기반 자동 대응</text>
+
+  <!-- result branches -->
+  <line x1="238" y1="616" x2="120" y2="658" stroke="#DC2626" stroke-width="2.5" marker-end="url(#ar)"/>
+  <text x="168" y="645" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" font-weight="600" fill="#DC2626">&#x2265; 80%</text>
+
+  <line x1="450" y1="616" x2="450" y2="658" stroke="#D97706" stroke-width="2.5" marker-end="url(#ao)"/>
+  <text x="469" y="644" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" font-weight="600" fill="#D97706">&#x2265; 70%</text>
+
+  <line x1="662" y1="616" x2="780" y2="658" stroke="#2563EB" stroke-width="2.5" marker-end="url(#ab)"/>
+  <text x="730" y="645" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" font-weight="600" fill="#2563EB">&lt; 70%</text>
+
+  <!-- ═══ RESULT: 차단 페이지 ═══ -->
+  <rect x="22" y="660" width="196" height="76" rx="15" fill="#FEF2F2" stroke="#EF4444" stroke-width="2"/>
+  <text x="120" y="693" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="17" font-weight="700" fill="#991B1B">&#x1F6A8;  차단 페이지</text>
+  <text x="120" y="716" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" fill="#B91C1C">리디렉션</text>
+
+  <!-- ═══ RESULT: Chrome 알림 ═══ -->
+  <rect x="350" y="660" width="200" height="76" rx="15" fill="#FFFDE7" stroke="#EAB308" stroke-width="2"/>
+  <text x="450" y="693" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="17" font-weight="700" fill="#713F12">&#x1F514;  Chrome 알림</text>
+  <text x="450" y="716" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" fill="#92400E">유해 의심 안내</text>
+
+  <!-- ═══ RESULT: 팝업 표시 ═══ -->
+  <rect x="682" y="660" width="196" height="76" rx="15" fill="#EFF6FF" stroke="#60A5FA" stroke-width="2"/>
+  <text x="780" y="693" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="17" font-weight="700" fill="#1E40AF">&#x1F4CA;  팝업 표시</text>
+  <text x="780" y="716" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="12" fill="#2563EB">결과 확인</text>
+
+  <!-- arrow results→DB save -->
+  <line x1="450" y1="736" x2="450" y2="764" stroke="#6366F1" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- ═══ NODE 5: DB 저장 ═══ -->
+  <rect x="115" y="766" width="670" height="88" rx="22" fill="#FFFBEB" stroke="#F59E0B" stroke-width="2.5"/>
+  <text x="450" y="804" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="20" font-weight="700" fill="#92400E">서버 DB 적재  →  탐지 결과 저장</text>
+  <text x="450" y="830" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="13" fill="#A16207">수집 데이터는 추후 라벨링 후 모델 재학습에 활용</text>
+
+  <!-- Footer -->
+  <text x="450" y="882" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif" font-size="11.5" fill="#9CA3AF">※  임계값 초과 시  Chrome 알림 자동 실행 ( &#x2265; 70% )  /  유해 사이트 차단 페이지 리디렉션 ( &#x2265; 80% )</text>
+</svg>
