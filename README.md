@@ -21,15 +21,15 @@
 
 ```mermaid
 flowchart TD
-    A([🌐 URL 접속]):::start --> B{"서버 DB 조회\n화이트 · 블랙리스트"}:::dec
-    B -->|화이트리스트| W([✅ 안전 · 즉시 반환]):::safe
-    B -->|블랙리스트| BL([🔴 즉시 차단]):::block
-    B -->|미등록| C{"타이틀 키워드 감지\n성인 · 도박"}:::dec
-    C -->|감지| K([🚨 경고 페이지 전환]):::block
-    C -->|없음| D["HTML 수집 → 80피처 추출 → ONNX 추론"]:::proc
-    D -->|확률 ≥ 80%| F([🚨 차단 페이지 리디렉션]):::block
-    D -->|확률 ≥ 70%| G([🔔 Chrome 알림 발송]):::warn
-    D -->|확률 < 70%| H([📊 팝업 결과 표시]):::safe
+    A([🌐 URL 접속]):::start --> B{"DB 조회\n화이트·블랙리스트"}:::dec
+    B -->|화이트| W([✅ 안전]):::safe
+    B -->|블랙| BL([🔴 차단]):::block
+    B -->|미등록| C{"키워드 감지\n성인·도박"}:::dec
+    C -->|감지| K([🚨 경고 전환]):::block
+    C -->|없음| D["HTML → 80피처 → ONNX"]:::proc
+    D -->|≥ 80%| F([🚨 차단 리디렉션]):::block
+    D -->|≥ 70%| G([🔔 알림 발송]):::warn
+    D -->|< 70%| H([📊 팝업 표시]):::safe
 
     classDef start fill:#6C4FE8,stroke:none,color:#fff,font-weight:700
     classDef dec   fill:#F0EBFF,stroke:#9575CD,stroke-width:2px,color:#311B92
@@ -45,40 +45,35 @@ flowchart TD
 
 <table>
 <tr>
-<td width="50%" valign="top">
-
-**🧠 AI 유해 사이트 탐지**
-- HTML 수집 → 80피처 추출 → ONNX 온디바이스 추론
-- 화이트/블랙리스트 즉시 판별 (AI 추론 생략)
-- 우클릭 링크 사전 탐지 (방문 없이 즉시 분석)
-- 외부 서버 전송 없음 — WASM 로컬 실행
-
+<th width="50%" align="left">🧠 AI 유해 사이트 탐지</th>
+<th width="50%" align="left">🛡️ 도박/성인 사이트 탐지 &amp; 성인 콘텐츠 탐지</th>
+</tr>
+<tr>
+<td valign="top">
+<code>HTML 수집 → 80피처 추출 → ONNX 추론</code><br>
+화이트/블랙리스트 즉시 판별 · AI 추론 생략<br>
+우클릭 링크 사전 탐지 · 방문 없이 즉시 분석<br>
+외부 서버 전송 없음 · WASM 로컬 실행
 </td>
-<td width="50%" valign="top">
-
-**🛡️ 도박/성인 사이트 탐지 & 성인 콘텐츠 탐지**
-- 성인·도박 타이틀 키워드 즉시 차단 (한·영 30종+)
-- 성인 이미지 자동 블러 (MobileNetV2 온디바이스)
-
+<td valign="top">
+성인·도박 타이틀 키워드 즉시 차단 · 한·영 <b>30종+</b><br>
+성인 이미지 자동 블러 · MobileNetV2 온디바이스
 </td>
 </tr>
 <tr>
-<td width="50%" valign="top">
-
-**⚡ 자동 대응**
-- Chrome 알림 ≥ 70% · 차단 페이지 ≥ 80%
-- 위험도별 툴바 아이콘 실시간 변경 🟢 🔵 🟠 🔴
-- 10분/3회 레이트 리밋 · 6시간 전역 쿨다운
-
+<th align="left">⚡ 자동 대응</th>
+<th align="left">📊 히스토리 &amp; 설정</th>
+</tr>
+<tr>
+<td valign="top">
+Chrome 알림 <b>≥ 70%</b> · 차단 페이지 <b>≥ 80%</b><br>
+툴바 아이콘 실시간 변경 🟢 🔵 🟠 🔴<br>
+10분/3회 레이트 리밋 · 6시간 전역 쿨다운
 </td>
-<td width="50%" valign="top">
-
-**📊 히스토리 & 설정**
-- 일간·주간 도넛 차트, 최대 999건 Full URL 로그
-- 판정 카테고리별 필터링 조회
-- 알림·차단 임계값 슬라이더 개별 조정
-- 성인·도박 차단 / 블러 / 다크모드 토글
-
+<td valign="top">
+일간·주간 도넛 차트 · Full URL 로그 최대 999건<br>
+카테고리 필터링 · 임계값 슬라이더 개별 조정<br>
+성인·도박 차단 / 블러 / 다크모드 토글
 </td>
 </tr>
 </table>
