@@ -21,15 +21,22 @@
 
 ```mermaid
 flowchart TD
-    A([🌐 URL 접속]) --> B{서버 DB 조회\n화이트 · 블랙리스트}
-    B -->|화이트리스트| W([✅ 안전 · 즉시 반환])
-    B -->|블랙리스트| BL([🔴 유해 · 즉시 차단])
-    B -->|미등록| C{타이틀 키워드 감지\n성인 · 도박}
-    C -->|감지| K([🚨 경고 페이지 즉시 전환])
-    C -->|없음| D["HTML 수집 → 80피처 추출 → ONNX 추론"]
-    D -->|확률 ≥ 80%| F([🚨 차단 페이지 리디렉션])
-    D -->|확률 ≥ 70%| G([🔔 Chrome 알림 발송])
-    D -->|확률 < 70%| H([📊 팝업 결과 표시])
+    A([🌐 URL 접속]):::start --> B{"서버 DB 조회\n화이트 · 블랙리스트"}:::dec
+    B -->|화이트리스트| W([✅ 안전 · 즉시 반환]):::safe
+    B -->|블랙리스트| BL([🔴 즉시 차단]):::block
+    B -->|미등록| C{"타이틀 키워드 감지\n성인 · 도박"}:::dec
+    C -->|감지| K([🚨 경고 페이지 전환]):::block
+    C -->|없음| D["HTML 수집 → 80피처 추출 → ONNX 추론"]:::proc
+    D -->|확률 ≥ 80%| F([🚨 차단 페이지 리디렉션]):::block
+    D -->|확률 ≥ 70%| G([🔔 Chrome 알림 발송]):::warn
+    D -->|확률 < 70%| H([📊 팝업 결과 표시]):::safe
+
+    classDef start fill:#6C4FE8,stroke:none,color:#fff,font-weight:700
+    classDef dec   fill:#F0EBFF,stroke:#9575CD,stroke-width:2px,color:#311B92
+    classDef safe  fill:#E8F5E9,stroke:#43A047,stroke-width:2px,color:#1B5E20,font-weight:600
+    classDef block fill:#FFEBEE,stroke:#E53935,stroke-width:2px,color:#B71C1C,font-weight:600
+    classDef warn  fill:#FFFDE7,stroke:#F9A825,stroke-width:2px,color:#E65100,font-weight:600
+    classDef proc  fill:#E3F2FD,stroke:#1E88E5,stroke-width:2px,color:#0D47A1,font-weight:600
 ```
 
 ---
